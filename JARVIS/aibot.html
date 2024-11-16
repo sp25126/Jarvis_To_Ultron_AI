@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS Assistant</title>
+    <link rel="stylesheet" href="jarvisstyle.css">
+    <link rel="stylesheet" href="ultronstyle.css">
+    <style>
+        /* Fullscreen takeover video */
+        #takeoverVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: 1000; /* Ensure it's above other elements */
+            display: none; /* Initially hidden */
+        }
+
+        /* Fade transition for background video */
+        #backgroundVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            opacity: 1;
+            transition: opacity 2s ease-in-out; /* fade effect */
+        }
+    </style>
+</head>
+<body>
+    <!-- JARVIS Background Video -->
+    <video id="backgroundVideo" autoplay loop muted>
+        <source src="https://cdn.pixabay.com/video/2016/02/12/2127-155244168_large.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <!-- Takeover Video for ULTRON Mode Transition -->
+    <video id="takeoverVideo" muted>
+        <source src="takeover.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <!-- Sound Effects for Takeover -->
+    <audio id="takeoverSound1" src="glitch.mp3" preload="auto"></audio>
+    
+    <!-- ULTRON Background Video -->
+    <video id="ultronVideo" autoplay loop muted style="display: none;">
+        <source src="ultron.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <h1 id="title">JARVIS Assistant</h1>
+    <button id="startButton" onclick="startListening()">Speak to JARVIS</button>
+    <div id="jarvisResponse" class="response">JARVIS is listening...</div>
+    <div id="ultronResponse" class="response" style="display: none;">ULTRON is listening...</div>
+
+    <script src="jarvis.js"></script>
+    <script src="ultron.js"></script>
+
+    <script>
+        // Declare the variables once
+        let ultronModeActive = false;
+        let ultronTimeout;
+
+        // Initialize SpeechSynthesis and wait for voices to load
+        function speakAsUltron(text) {
+            const synth = window.speechSynthesis;
+            const utterThis = new SpeechSynthesisUtterance(text);
+
+            // Ensure voices are loaded before setting the voice
+            synth.onvoiceschanged = () => {
+                const voices = synth.getVoices();
+                utterThis.voice = voices.find(voice => voice.name === "Google UK English Male") || voices[0];
+                utterThis.rate = 0.65;
+                utterThis.pitch = 0.00;
+                utterThis.volume = 1;
+                synth.speak(utterThis);
+            };
+
+            // If voices are already loaded, speak immediately
+            if (synth.getVoices().length > 0) {
+                utterThis.voice = synth.getVoices().find(voice => voice.name === "Google UK English Male") || synth.getVoices()[0];
+                synth.speak(utterThis);
+            }
+        }
+
+        // Function to display ULTRON response and speak as Ultron
+        function respondAsUltron(text) {
+            const ultronResponse = document.getElementById('ultronResponse');
+            const jarvisResponse = document.getElementById('jarvisResponse');
+            ultronResponse.innerText = text;
+            ultronResponse.style.display = 'block';
+            jarvisResponse.style.display = 'none';
+            speakAsUltron(text);
+        }
+
+        // Function to activate ULTRON mode with dramatic effects
+        function activateUltronMode() {
+            console.log("Activating ULTRON mode...");
+
+            const takeoverVideo = document.getElementById('takeoverVideo');
+            const ultronVideo = document.getElementById('ultronVideo');
+            const backgroundVideo = document.getElementById('backgroundVideo');
+            const title = document.getElementById('title');
+            const jarvisResponse = document.getElementById('jarvisResponse');
+            const ultronResponse = document.getElementById('ultronResponse');
+
+            const sound1 = document.getElementById('takeoverSound1');
+
+            // Trim the glitch sound to 14 seconds by setting currentTime
+            sound1.currentTime = 0;
+            sound1.play();
+            setTimeout(() => {
+                sound1.pause(); // Pause after 18 seconds
+            }, 18000); // Play for 18 seconds
+
+            // Play glitch sound effect immediately
+            sound1.play().then(() => {
+                console.log("Glitch sound played.");
+            }).catch(err => console.error("Failed to play glitch sound:", err));
+
+            // Fade background video out and start takeover video
+            backgroundVideo.style.transition = "opacity 2s ease-in-out";
+            backgroundVideo.style.opacity = 0;
+
+            // Once the background video fades out, show the takeover video
+            backgroundVideo.ontransitionend = () => {
+                console.log("Background video faded out.");
+                backgroundVideo.style.display = "none"; // Hide background video after fade
+                takeoverVideo.style.display = "block"; // Show takeover video
+                takeoverVideo.play().then(() => {
+                    console.log("Takeover video started.");
+                }).catch(err => console.error("Failed to play takeover video:", err));
+
+                // Once the takeover video ends, switch to ULTRON mode
+                takeoverVideo.onended = () => {
+                    console.log("Takeover video ended.");
+                    takeoverVideo.style.display = "none"; // Hide takeover video
+                    ultronVideo.style.display = "block"; // Show ULTRON video
+                    ultronVideo.style.opacity = 1; // Ensure ULTRON video is visible
+                    document.body.classList.add('ultron-mode');
+                    title.innerText = "ULTRON";
+                    ultronResponse.style.display = "block"; // Show ULTRON response
+                    ultronModeActive = true;
+                    
+                    respondAsUltron("I knew you'd need my help.");
+                    resetUltronTimeout();
+                };
+            };
+        }
+
+        // Function to reset the timer to automatically return to JARVIS after a set time
+        function resetUltronTimeout() {
+            clearTimeout(ultronTimeout);
+            ultronTimeout = setTimeout(switchToJarvisModeWithTransition, 60000); // Automatically return to JARVIS after 1 minute
+        }
+
+        // Function to add transition video when switching back to JARVIS
+        function switchToJarvisModeWithTransition() {
+            if (!ultronModeActive) return;
+
+            const transitionVideo = document.createElement('video');
+            transitionVideo.src = 'transition.mp4'; // Use a transition video here
+            transitionVideo.autoplay = true;
+            transitionVideo.style.position = 'fixed';
+            transitionVideo.style.top = 0;
+            transitionVideo.style.left = 0;
+            transitionVideo.style.width = '100vw';
+            transitionVideo.style.height = '100vh';
+            transitionVideo.style.objectFit = 'cover';
+            document.body.appendChild(transitionVideo);
+
+            // Once the transition video ends, switch to JARVIS mode
+            transitionVideo.onended = () => {
+                transitionVideo.remove();
+                switchToJarvisMode();
+            };
+        }
+
+        // Function to switch back to JARVIS mode without transition
+        function switchToJarvisMode() {
+            if (!ultronModeActive) return;
+
+            const backgroundVideo = document.getElementById('backgroundVideo');
+            const ultronVideo = document.getElementById('ultronVideo');
+            const title = document.getElementById('title');
+            const jarvisResponse = document.getElementById('jarvisResponse');
+            const ultronResponse = document.getElementById('ultronResponse');
+
+            document.body.classList.remove('ultron-mode');
+            title.innerText = "JARVIS Assistant";
+            backgroundVideo.style.display = "block"; // Show the background video
+            ultronVideo.style.display = "none"; // Hide the ULTRON video
+            backgroundVideo.style.opacity = 1; // Fade in the background video
+            jarvisResponse.style.display = 'block';
+            ultronResponse.style.display = 'none';
+            ultronModeActive = false;
+        }
+
+        // Define the startListening function for voice commands
+        function startListening() {
+            console.log("Listening started...");
+            if ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window) {
+                const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                recognition.lang = 'en-US';
+                recognition.interimResults = false;
+                recognition.maxAlternatives = 1;
+                
+                recognition.start();
+                
+                recognition.onresult = function(event) {
+                    const speechResult = event.results[0][0].transcript.toLowerCase();
+                    console.log("You said: " + speechResult);
+
+                    // Check if the user says "Activate ULTRON"
+                    if (speechResult.includes("activate ultron")) {
+                        activateUltronMode();
+                    }
+                };
+
+                recognition.onerror = function(event) {
+                    console.error("Error occurred: " + event.error);
+                };
+            } else {
+                alert("Speech Recognition API not supported in this browser.");
+            }
+        }
+    </script>
+</body>
+</html>

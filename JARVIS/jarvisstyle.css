@@ -1,0 +1,54 @@
+/* jarvisstyle.css */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
+
+body {
+    font-family: 'Orbitron', sans-serif;
+    color: #ffffff;
+    text-align: center;
+    padding: 50px;
+    overflow: hidden;
+    position: relative;
+    transition: background-color 1s ease;
+}
+
+#backgroundVideo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+}
+
+h1 {
+    font-size: 3em;
+    margin-bottom: 30px;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.7), 0 0 30px rgba(0, 255, 255, 0.7);
+}
+
+#jarvisResponse {
+    font-size: 1.5em;
+    margin-top: 20px;
+    color: #00ffff;
+    text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+}
+
+#startButton {
+    background: rgba(0, 255, 255, 0.5);
+    border: 2px solid #00ffff;
+    color: #00ffff;
+    padding: 15px 32px;
+    font-size: 1.2em;
+    cursor: pointer;
+    border-radius: 10px;
+    transition: 0.4s ease;
+    box-shadow: 0 0 15px #00ffff, 0 0 20px #00ffff;
+}
+
+#startButton:hover {
+    background-color: #00ffff;
+    color: #1c1c1c;
+    box-shadow: 0 0 30px #00ffff, 0 0 40px #00ffff;
+}

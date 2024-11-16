@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JARVIS Assistant</title>
+    <style>
+        /* CSS Styling */
+        body {
+            font-family: 'Orbitron', sans-serif;
+            color: #ffffff;
+            text-align: center;
+            padding: 50px;
+            overflow: hidden;
+            position: relative;
+            background-color: #1c1c1c;
+        }
+
+        #backgroundVideo {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -1;
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            text-shadow: 0 0 20px rgba(0, 255, 255, 0.7), 0 0 30px rgba(0, 255, 255, 0.7);
+        }
+
+        #response {
+            font-size: 1.5em;
+            margin-top: 20px;
+            text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff;
+            opacity: 1;
+        }
+
+        button {
+            background: rgba(0, 255, 255, 0.5);
+            border: 2px solid #00ffff;
+            color: #00ffff;
+            padding: 15px 32px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px #00ffff, 0 0 20px #00ffff;
+            margin-top: 10px;
+        }
+
+        #menu {
+            display: none;
+            position: absolute;
+            top: 60px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.8);
+            color: #00ffff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 15px #00ffff;
+            z-index: 1;
+        }
+
+        #menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        #menu ul li {
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        #menu ul li:hover {
+            background: rgba(0, 255, 255, 0.2);
+        }
+
+        .hamburger {
+            font-size: 30px;
+            color: #00ffff;
+            cursor: pointer;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <video id="backgroundVideo" autoplay loop muted>
+        <source src="https://cdn.pixabay.com/video/2016/02/12/2127-155244168_large.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+
+    <h1 id="title">JARVIS Assistant</h1>
+    <div class="hamburger" onclick="toggleMenu()">☰</div>
+    <div id="menu">
+        <ul>
+            <li onclick="executeCommand('play romantic songs')">Play Romantic Songs</li>
+            <li onclick="executeCommand('play party songs')">Play Party Songs</li>
+            <li onclick="executeCommand('play sad songs')">Play Sad Songs</li>
+            <li onclick="executeCommand('play phonk')">Play Phonk</li>
+            <li onclick="executeCommand('play lofi')">Play Lofi</li>
+            <li onclick="executeCommand('generate an image')">Generate an Image</li>
+        </ul>
+    </div>
+    <button id="startButton" onclick="startListening()">Speak to JARVIS</button>
+    <div id="response"></div>
+
+    <script>
+        // JavaScript for Voice Commands and YouTube Integration
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+
+        const responseText = document.getElementById('response');
+        const menu = document.getElementById('menu');
+
+        const commandList = {
+            "play romantic songs": "romantic songs",
+            "play party songs": "party songs",
+            "play sad songs": "sad songs",
+            "play phonk": "phonk",
+            "play lofi": "lofi",
+            "generate an image": "image generation"
+        };
+
+        function speak(text) {
+            const synth = window.speechSynthesis;
+            const utterThis = new SpeechSynthesisUtterance(text);
+            utterThis.rate = 1;
+            synth.speak(utterThis);
+        }
+
+        function startListening() {
+            recognition.start();
+            speak("Initializing JARVIS systems, please proceed.");
+        }
+
+        recognition.onresult = function(event) {
+            const command = event.results[0][0].transcript.toLowerCase();
+            document.getElementById('response').innerText = `Processing: ${command}`;
+            if (command in commandList) {
+                handleCommand(command);
+            } else {
+                respond("Command not recognized. Please try a command from the list.");
+            }
+        };
+
+        function handleCommand(command) {
+            const query = commandList[command];
+            if (query === "image generation") {
+                speak("Generating an image.");
+            } else {
+                searchYouTubeForSongs(query);
+            }
+        }
+
+        function searchYouTubeForSongs(query) {
+            window.open(`https://www.youtube.com/results?search_query=${encodeURIComponent(query)}`, '_blank');
+            respond(`Searching YouTube for ${query}.`);
+        }
+
+        function toggleMenu() {
+            menu.style.display = menu.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function executeCommand(command) {
+            if (command in commandList) {
+                handleCommand(command);
+            }
+            menu.style.display = 'none';
+        }
+
+        function respond(text) {
+            responseText.innerText = text;
+            speak(text);
+        }
+
+        recognition.onerror = function() {
+            respond("I couldn't process that. Try again.");
+        };
+    </script>
+</body>
+</html>

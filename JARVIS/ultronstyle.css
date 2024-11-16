@@ -1,0 +1,38 @@
+/* ultronstyle.css */
+
+body.ultron-mode {
+    background-color: #1c1c1c !important;
+    color: #ffa500;
+}
+
+.ultron-mode h1 {
+    color: #ffa500;
+    text-shadow: 0 0 20px rgba(0, 255, 255, 0.7), 0 0 30px rgba(0, 255, 255, 0.7);
+}
+
+#ultronResponse {
+    font-size: 1.5em;
+    margin-top: 20px;
+    color: #ffa500;
+    text-shadow: 0 0 10px #00ffff, 0 0 20px #00ffff; /* Blue shadow */
+}
+
+.ultron-mode #startButton {
+    background: rgba(255, 165, 0, 0.5);
+    border: 2px solid #ffa500;
+    color: #ffa500;
+    box-shadow: 0 0 15px #00ffff, 0 0 20px #00ffff; /* Blue shadow for button */
+}
+
+#ultronVideo {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    z-index: -1;
+    opacity: 0;
+    transition: opacity 1s ease;
+}
