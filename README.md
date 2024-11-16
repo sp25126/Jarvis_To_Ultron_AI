@@ -1,4 +1,5 @@
--> I want to create a full fledged assistant AI to create an ai network at home ... this can help you control aything using your phone , I want to connect every  device that uses network at home 
+-> I want to create a full fledged assistant AI to create an ai network at home ... this can help you control aything using your phone , I want to connect every  device that uses network at home.
+-> Rn this file in your compiler to see what I have done till now
 -> You should first make a sample file and run it in your compiler 
 -> Make sure to only use JS , CSS , HTML , NODE JS
 -> I have provided ppn file from porcupine library and there should be an access key too , if not pls make changes accordingly
